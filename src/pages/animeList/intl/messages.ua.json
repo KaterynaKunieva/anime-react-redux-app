@@ -1,0 +1,13 @@
+{
+  "deleteNotification": "Об'єкт видалено",
+  "deleteConfirmationTitle": "Підтвердження видалення",
+  "deleteConfirmationText": "Ви впевнені, що хочете видалити це аніме?",
+  "deleteConfirmationBtnConfirm": "Підтвердити",
+  "deleteConfirmationBtnClose": "Закрити",
+  "deleteConfirmationBtnCancel": "Скасувати",
+  "addButtonText": "Додати аніме",
+  "filterButtonText": "Фільтрувати",
+  "filterParam1": "Рік",
+  "filterParam2": "Автор",
+  "score": "Рейтинг"
+}

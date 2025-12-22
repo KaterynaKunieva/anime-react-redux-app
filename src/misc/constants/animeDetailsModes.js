@@ -1,0 +1,5 @@
+export const ANIME_DETAILS_MODES = {
+  CREATE: "CREATE",
+  UPDATE: "UPDATE",
+  VIEW: "VIEW",
+}

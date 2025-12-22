@@ -31,13 +31,14 @@ const TextField = ({
   onChange,
   onSelect,
   required = false,
-  value,
+  value = "",
+  ...rest
 }) => {
   const { theme } = useTheme();
-  const [ state, setState ] = useState({
+  const [state, setState] = useState({
     isFocused: false,
   });
-  const isEmptyValue = !value.length;
+  const isEmptyValue = !value;
   const labelColor = useMemo(() => {
     let color;
     if (isError && !isEmptyValue) {
@@ -52,22 +53,34 @@ const TextField = ({
 
   return (
     <TextFieldMui
+      {...rest}
       autoFocus={autoFocus}
       disabled={disabled}
       error={isError}
       fullWidth
       helperText={helperText}
       InputProps={{
-        endAdornment: AdornmentEnd && (
-          <InputAdornmentMui position="end">
-            {AdornmentEnd}
-          </InputAdornmentMui>
-        ),
-        startAdornment: AdornmentStart && (
-          <InputAdornmentMui position="start">
-            {AdornmentStart}
-          </InputAdornmentMui>
-        ),
+        ...rest.InputProps,
+        endAdornment: <>
+          {
+            AdornmentEnd && (
+              <InputAdornmentMui position="end">
+                {AdornmentEnd}
+              </InputAdornmentMui>
+            )
+          }
+          {rest.InputProps?.endAdornment}
+        </>,
+        startAdornment: <>
+          {
+            AdornmentStart && (
+              <InputAdornmentMui position="start">
+                {AdornmentStart}
+              </InputAdornmentMui>
+            )
+          }
+          {rest.InputProps?.startAdornment}
+        </>,
       }}
       label={(
         <Typography color={labelColor}>
@@ -108,7 +121,9 @@ const TextField = ({
                 : theme.input.color[colorVariant].border}`,
             }
             : {},
+          ...rest.rootsx,
         },
+        ...rest.sx,
       }}
       type={inputType}
       value={value}

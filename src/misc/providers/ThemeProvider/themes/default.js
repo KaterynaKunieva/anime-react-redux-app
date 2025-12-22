@@ -208,6 +208,11 @@ const theme = {
       },
     },
   },
+  notification: {
+    primaryColor: '#000',
+    backgroundColor: '#16bb0066',
+  },
+  animeAccentColor: "#16bb00",
 };
 
 export default theme;

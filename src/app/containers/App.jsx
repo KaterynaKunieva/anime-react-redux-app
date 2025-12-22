@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   BrowserRouter,
   Routes,
@@ -13,10 +13,13 @@ import * as pages from 'constants/pages';
 import AuthoritiesProvider from 'misc/providers/AuthoritiesProvider';
 import DefaultPage from 'pageProviders/Default';
 import Loading from 'components/Loading';
+import Notification from 'components/Notification';
 import LoginPage from 'pageProviders/Login';
 import PageContainer from 'pageProviders/components/PageContainer';
 import pageURLs from 'constants/pagesURLs';
 import SecretPage from 'pageProviders/Secret';
+import AnimeListPage from 'pageProviders/AnimeList';
+import AnimeDetailsPage from 'pageProviders/AnimeDetails';
 import ThemeProvider from 'misc/providers/ThemeProvider';
 import UserProvider from 'misc/providers/UserProvider';
 
@@ -30,6 +33,8 @@ function App() {
   const dispatch = useDispatch();
   const [state, setState] = useState({
     componentDidMount: false,
+    notificationMessage: null,
+    notificationIsVisible: false,
   });
 
   const {
@@ -51,6 +56,14 @@ function App() {
       componentDidMount: true,
     });
   }, []);
+
+  const showNotification = (notificationMessage) => {
+    setState(prevState => ({
+      ...prevState,
+      notificationMessage,
+      notificationIsVisible: true,
+    }))
+  }
 
   return (
     <UserProvider>
@@ -114,6 +127,29 @@ function App() {
                       path={`${pageURLs[pages.login]}`}
                     />
                     <Route
+                      element={
+                        <AnimeListPage
+                          showNotification={showNotification}
+                        />}
+                      path={pageURLs[pages.animeList]}
+                    />
+                    <Route
+                      element={
+                        <AnimeDetailsPage
+                          showNotification={showNotification}
+                        />}
+                      path={pageURLs[pages.animeNew]}
+                    />
+                    <Route
+                      element={
+                        <AnimeDetailsPage
+                          defaultPage={pageURLs[pages.defaultPage]}
+                          showNotification={showNotification}
+                        />
+                      }
+                      path={pageURLs[pages.animeDetails]}
+                    />
+                    <Route
                       element={(
                         <MissedPage
                           redirectPage={`${pageURLs[pages.defaultPage]}`}
@@ -123,6 +159,14 @@ function App() {
                     />
                   </Routes>
                 )}
+                <Notification
+                  message={state.notificationMessage}
+                  isVisible={state.notificationIsVisible}
+                  setIsVisible={(isVisible) => setState(prevState => ({
+                    ...prevState,
+                    notificationIsVisible: isVisible
+                  }))}
+                />
               </IntlProvider>
             )}
           </BrowserRouter>

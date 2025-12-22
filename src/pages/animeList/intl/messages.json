@@ -1,0 +1,13 @@
+{
+  "deleteNotification": "Item deleted",
+  "deleteConfirmationTitle": "Delete Confirmation",
+  "deleteConfirmationText": "Are you sure you want to delete this anime?",
+  "deleteConfirmationBtnConfirm": "Confirm",
+  "deleteConfirmationBtnClose": "Close",
+  "deleteConfirmationBtnCancel": "Cancel",
+  "addButtonText": "Add anime",
+  "filterButtonText": "Filter",
+  "filterParam1": "Year",
+  "filterParam2": "Author",
+  "score": "Rating"
+}

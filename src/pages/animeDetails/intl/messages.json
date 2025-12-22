@@ -1,0 +1,17 @@
+{
+  "backBtn": "Back",
+  "mode": "Mode",
+  "cancelBtn": "Cancel",
+  "inputTitle": "Title",
+  "inputYear": "Year",
+  "inputAuthor": "Author",
+  "inputScore": "Rating",
+  "inputErrorYearEmpty": "Please specify the year",
+  "inputErrorYearInvalid": "Year must be between 1900 and 2035",
+  "inputErrorTitleEmpty": "Title is required",
+  "inputErrorAuthorEmpty": "Author is required",
+  "inputErrorScoreInvalid": "Rating must be between 0 and 10",
+  "submitBtnUpdate": "Save",
+  "submitBtnCreate": "Create",
+  "updateNotificationSuccess": "Changes saved successfully"
+}
