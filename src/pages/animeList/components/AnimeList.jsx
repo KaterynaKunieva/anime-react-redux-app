@@ -1,4 +1,5 @@
 import React from 'react';
+import { useIntl } from "react-intl";
 import AnimeListItem from "../components/AnimeListItem";
 import useTheme from "../../../misc/hooks/useTheme";
 import { createUseStyles } from "react-jss";
@@ -16,6 +17,7 @@ const getClasses = createUseStyles((theme) => ({
 const AnimeList = ({ items, onDelete }) => {
     const { theme } = useTheme();
     const classes = getClasses({ theme });
+    const { formatMessage } = useIntl();
 
     return (
         <div className={classes.animeList}>
@@ -31,7 +33,7 @@ const AnimeList = ({ items, onDelete }) => {
                         >
                         </AnimeListItem>
                     ))
-                    : "Немає даних"
+                    : formatMessage({ id: 'noDataMessage' })
             }
         </div>
     )

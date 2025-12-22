@@ -9,5 +9,6 @@
   "filterButtonText": "Filter",
   "filterParam1": "Year",
   "filterParam2": "Author",
-  "score": "Rating"
+  "score": "Rating",
+  "noDataMessage": "No data"
 }
