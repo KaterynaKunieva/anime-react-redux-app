@@ -30,7 +30,7 @@ const CreateAnimeForm = ({ classes, showNotification }) => {
             dispatch(actionsAnime.fetchAnimeCreate(inputValues))
                 .then(result => {
                     if (result?.success) {
-                        showNotification("Аніме додано");
+                        showNotification(formatMessage({ id: 'createNotificationSuccess' }));
                         changePage({ pathname: pagesURLs[pages.animeList] });
                     }
                 });

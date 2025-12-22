@@ -9,5 +9,6 @@
   "filterButtonText": "Фільтрувати",
   "filterParam1": "Рік",
   "filterParam2": "Автор",
-  "score": "Рейтинг"
+  "score": "Рейтинг",
+  "noDataMessage": "Немає даних"
 }

@@ -13,5 +13,6 @@
   "inputErrorScoreInvalid": "Рейтинг від 0 до 10",
   "submitBtnUpdate": "Зберегти",
   "submitBtnCreate": "Створити",
-  "updateNotificationSuccess": "Зміни збережено"
+  "updateNotificationSuccess": "Зміни збережено",
+  "createNotificationSuccess": "Аніме додано"
 }

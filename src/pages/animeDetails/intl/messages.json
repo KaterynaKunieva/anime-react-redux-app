@@ -13,5 +13,6 @@
   "inputErrorScoreInvalid": "Rating must be between 0 and 10",
   "submitBtnUpdate": "Save",
   "submitBtnCreate": "Create",
-  "updateNotificationSuccess": "Changes saved successfully"
+  "updateNotificationSuccess": "Changes saved successfully",
+  "createNotificationSuccess": "Anime added successfully"
 }
