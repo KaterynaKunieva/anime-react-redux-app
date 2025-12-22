@@ -13,6 +13,11 @@ const setItem = (key, value) => {
 export const keys = {
   TOKEN: 'TOKEN',
   TOKEN_EXPIRATION: 'TOKEN_EXP',
+  ANIME_FILTERS: 'ANIME_FILTERS',
+  ANIME_PAGINATION: 'ANIME_PAGINATION',
+  ANIME_DELETED: 'ANIME_DELETED',
+  ANIME_CREATED: 'ANIME_CREATED',
+  ANIME_UPDATED: 'ANIME_UPDATED',
 };
 
 const forExport = {

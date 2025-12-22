@@ -30,6 +30,7 @@ function Button({
   onClick,
   startIcon,
   variant = variants.secondary,
+  sx = {},
 }) {
   const { theme } = useTheme();
   return (
@@ -38,6 +39,7 @@ function Button({
         <ButtonMUI
           disabled
           variant="contained"
+          sx={sx}
         >
           <CircularProgress size={16} />
         </ButtonMUI>
@@ -62,6 +64,7 @@ function Button({
                 background: theme.button.color[colorVariant].backgroundDisabled,
               },
             },
+            ...sx,
           }}
           variant={MUIVariantsToVariants[variant]}
         >

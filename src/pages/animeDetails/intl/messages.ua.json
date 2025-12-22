@@ -1,0 +1,17 @@
+{
+  "backBtn": "Назад",
+  "mode": "Режим",
+  "cancelBtn": "Скасувати",
+  "inputTitle": "Назва",
+  "inputYear": "Рік",
+  "inputAuthor": "Автор",
+  "inputScore": "Рейтинг",
+  "inputErrorYearEmpty": "Вкажіть рік",
+  "inputErrorYearInvalid": "Рік має бути між 1900 та 2035",
+  "inputErrorTitleEmpty": "Назва обов'язкова",
+  "inputErrorAuthorEmpty": "Автор обов'язковий",
+  "inputErrorScoreInvalid": "Рейтинг від 0 до 10",
+  "submitBtnUpdate": "Зберегти",
+  "submitBtnCreate": "Створити",
+  "updateNotificationSuccess": "Зміни збережено"
+}
