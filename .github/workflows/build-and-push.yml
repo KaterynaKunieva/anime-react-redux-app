@@ -1,0 +1,46 @@
+name: Build and Push Frontend
+on:
+  push:
+    branches: [main, master]
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: anime-react-redux-app
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Lowercase Owner
+        id: owner
+        run: echo "value=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_OUTPUT
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          build-args: |
+            REACT_APP_API_URL=/api
+          tags: |
+            ${{ env.REGISTRY }}/${{ steps.owner.outputs.value }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ steps.owner.outputs.value }}/${{ env.IMAGE_NAME }}:latest
+      - name: Trigger Deploy
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.INFRA_REPO_PAT }}
+          repository: ${{ github.repository_owner }}/anime-k8s-infrastructure
+          event-type: deploy
+          client-payload: '{"services": "frontend", "tag": "${{ github.sha }}", "source_repo": "${{ github.repository }}"}'
