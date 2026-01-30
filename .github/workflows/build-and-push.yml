@@ -33,7 +33,7 @@ jobs:
           context: .
           push: true
           build-args: |
-            REACT_APP_API_URL=/api
+            REACT_APP_API_URL=
           tags: |
             ${{ env.REGISTRY }}/${{ steps.owner.outputs.value }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
             ${{ env.REGISTRY }}/${{ steps.owner.outputs.value }}/${{ env.IMAGE_NAME }}:latest
