@@ -58,7 +58,7 @@ const AnimeDetailsContainer = (props) => {
     const classes = getClasses({ theme });
 
     const [state, setState] = useState({
-        mode: null,
+        mode: props.id ? ANIME_DETAILS_MODES.VIEW : ANIME_DETAILS_MODES.CREATE,
     });
 
     const setMode = useCallback((mode) => {
@@ -67,10 +67,6 @@ const AnimeDetailsContainer = (props) => {
             mode: mode,
         }));
     }, []);
-
-    useEffect(() => {
-        setMode(props.id ? ANIME_DETAILS_MODES.VIEW : ANIME_DETAILS_MODES.CREATE)
-    }, [props.id, setMode]);
 
     useEffect(() => {
         dispatch(actionsAnime.clearSaveError());
