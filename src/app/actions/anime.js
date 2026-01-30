@@ -95,7 +95,7 @@ const getAnimeList = (filters = {}, pagination = {}) => {
         filters,
         ...pagination,
     }, {
-        timeout: 500,
+        timeout: 10000,
     }
     );
 };
@@ -108,7 +108,7 @@ const deleteAnime = (id) => {
     return axios.delete(
         `${ANIME_SERVICE}/${id}`,
         {
-            timeout: 500,
+            timeout: 10000,
         }
     );
 };
@@ -121,7 +121,7 @@ const getAnimeDetails = (id) => {
     return axios.get(
         `${ANIME_SERVICE}/${id}`,
         {
-            timeout: 500,
+            timeout: 10000,
         }
     );
 };
@@ -135,7 +135,7 @@ const createAnime = (data) => {
         `${ANIME_SERVICE}`,
         data,
         {
-            timeout: 500,
+            timeout: 10000,
         }
     );
 };
@@ -149,7 +149,7 @@ const updateAnime = (id, data) => {
         `${ANIME_SERVICE}/${id}`,
         data,
         {
-            timeout: 500,
+            timeout: 10000,
         }
     );
 };
