@@ -19,13 +19,13 @@ import pageURLs from 'constants/pagesURLs';
 import AnimeListPage from 'pageProviders/AnimeList';
 import AnimeDetailsPage from 'pageProviders/AnimeDetails';
 import ThemeProvider from 'misc/providers/ThemeProvider';
-import storage from '../../misc/storage';
 
 import actionsUser from '../actions/user';
 import Header from '../components/Header';
 import IntlProvider from '../components/IntlProvider';
 import MissedPage from '../components/MissedPage';
 import SearchParamsConfigurator from '../components/SearchParamsConfigurator';
+import storage, { keys } from '../../misc/storage';
 
 function App() {
   const dispatch = useDispatch();
@@ -45,7 +45,9 @@ function App() {
       onSignOut: () => dispatch(actionsUser.fetchSignOut()),
     });
 
-    dispatch(actionsUser.fetchUser());
+    if (storage.getItem(keys.MANUAL_SIGN_OUT) === "false") { // autologin
+      dispatch(actionsUser.fetchUser());
+    }
 
     setState(prevState => ({
       ...prevState,

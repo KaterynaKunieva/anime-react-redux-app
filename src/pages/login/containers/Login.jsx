@@ -5,6 +5,7 @@ import useTheme from 'misc/hooks/useTheme';
 import Button from 'components/Button';
 import Typography from 'components/Typography';
 import PageContainer from 'pageProviders/components/PageContainer';
+import storage, { keys } from '../../../misc/storage';
 
 const useStyles = createUseStyles((theme) => ({
   container: {
@@ -29,6 +30,7 @@ function Login(props) {
   const classes = useStyles({ theme });
 
   const handleGoogleLogin = () => {
+    storage.setItem(keys.MANUAL_SIGN_OUT, false);
     const currentPath = window.location.pathname + window.location.search;
     window.location.href = `/oauth/authenticate?redirectTo=${encodeURIComponent(currentPath)}`;
   };

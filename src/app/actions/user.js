@@ -1,6 +1,6 @@
 import axios from 'misc/requests';
 import config from "../../config";
-import storage from '../../misc/storage';
+import storage, { keys } from '../../misc/storage';
 import {
   RECEIVE_USER,
   REQUEST_SIGN_OUT,
@@ -43,23 +43,22 @@ const postSignOut = () => {
 };
 
 const fetchUser = () => (dispatch) => {
-  if (storage.getItem('manual_logout')) {
-    return;
-  }
-
   dispatch(requestUser());
   return getProfile()
     .then(data => {
       dispatch(receiveUser(data));
     })
     .catch((err) => {
-      if (err.status !== 401) {
+      if (err.status === 401) {
+        dispatch(fetchSignOut());
+      } else {
         dispatch(receiveUser(MOCK_USER_RESPONSE));
       }
     });
 };
 
 const fetchSignOut = () => (dispatch) => {
+  storage.setItem(keys.MANUAL_SIGN_OUT, true);
   dispatch(requestSignOut());
   return postSignOut()
     .catch(() => {
