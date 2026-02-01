@@ -43,17 +43,19 @@ const postSignOut = () => {
 };
 
 const fetchUser = () => (dispatch) => {
+  if (storage.getItem('manual_logout')) {
+    return;
+  }
+
   dispatch(requestUser());
   return getProfile()
     .then(data => {
       dispatch(receiveUser(data));
     })
     .catch((err) => {
-      if (err.status === 401) {
-        dispatch(fetchSignOut());
-        return;
+      if (err.status !== 401) {
+        dispatch(receiveUser(MOCK_USER_RESPONSE));
       }
-      dispatch(receiveUser(MOCK_USER_RESPONSE));
     });
 };
 

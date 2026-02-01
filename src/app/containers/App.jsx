@@ -19,6 +19,7 @@ import pageURLs from 'constants/pagesURLs';
 import AnimeListPage from 'pageProviders/AnimeList';
 import AnimeDetailsPage from 'pageProviders/AnimeDetails';
 import ThemeProvider from 'misc/providers/ThemeProvider';
+import storage from '../../misc/storage';
 
 import actionsUser from '../actions/user';
 import Header from '../components/Header';
