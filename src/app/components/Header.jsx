@@ -99,12 +99,12 @@ function Header({
     isUserMenuOpened: false,
   });
 
-  const userName = user.user?.name || user.user?.email || '';
+  const userName = user.firstName || user.email || '';
 
   const actualOrderedRightPanelItemTypes = useMemo(() => {
     const result = [];
 
-    if (user.user) {
+    if (user.isAuthorized) {
       result.push(rightPanelItemTypes.USER_NAME);
     }
 
@@ -117,7 +117,7 @@ function Header({
       acc.push({ type: item, id: item });
       return acc;
     }, []);
-  }, [user.user]);
+  }, [user.isAuthorized]);
 
   return (
     <div className={classes.container}>

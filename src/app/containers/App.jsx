@@ -35,7 +35,7 @@ function App() {
   });
 
   const {
-    user,
+    isAuthorized,
     isFetchingUser,
   } = useSelector(({ user }) => user);
 
@@ -76,7 +76,7 @@ function App() {
 
             {!isFetchingUser && (
               <>
-                {!user ? (
+                {!isAuthorized ? (
                   <Login />
                 ) : (
                   <Routes>
