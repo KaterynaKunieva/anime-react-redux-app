@@ -15,7 +15,9 @@ const addAxiosInterceptors = ({
 
       if (status === 401) {
         onSignOut();
-        window.location.href = '/';
+        if (window.location.pathname !== '/') {
+          window.location.href = '/';
+        }
       }
 
       return Promise.reject(error.response?.data || error);
