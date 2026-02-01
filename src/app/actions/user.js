@@ -34,8 +34,9 @@ const getProfile = () => {
 const fetchUser = () => (dispatch) => {
   dispatch(requestUser());
   return getProfile()
-    .then(user => {
-      dispatch(receiveUser(user));
+    .then(data => {
+      console.log("User data received from server:", data);
+      dispatch(receiveUser(data));
     })
     .catch((err) => {
       if (err.response && err.response.status === 401) {
