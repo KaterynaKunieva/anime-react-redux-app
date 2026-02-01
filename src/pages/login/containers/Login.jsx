@@ -29,7 +29,8 @@ function Login(props) {
   const classes = useStyles({ theme });
 
   const handleGoogleLogin = () => {
-    window.location.href = "/oauth/authenticate";
+    const currentPath = window.location.pathname + window.location.search;
+    window.location.href = `/oauth/authenticate?redirectTo=${encodeURIComponent(currentPath)}`;
   };
 
   return (
