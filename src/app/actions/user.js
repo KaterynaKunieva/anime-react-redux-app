@@ -39,7 +39,7 @@ const fetchUser = () => (dispatch) => {
       dispatch(receiveUser(data));
     })
     .catch((err) => {
-      if (err.response && err.response.status === 401) {
+      if (err.status === 401) {
         dispatch(fetchSignOut());
         return;
       }
