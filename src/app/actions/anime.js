@@ -17,6 +17,7 @@ import {
     CLEAR_SAVE_ERROR,
 } from '../constants/actionTypes';
 import animeAPI from '../mocks/animeAPI';
+import authorActions from "./author";
 
 const requestAnimeList = () => ({
     type: REQUEST_ANIME_LIST,
@@ -223,22 +224,34 @@ const fetchAnimeUpdate = (id, data) => (dispatch) => {
         });
 };
 
-const fetchAnimeCreate = (data) => (dispatch) => {
-    dispatch(requestSaveAnime());
-    return createAnime(data)
-        .catch(() => {
-            try {
-                return animeAPI.createAnime(data);
-            } catch (err) {
-                return Promise.reject(err);
-            }
-        }).then((id) => {
-            dispatch(successSaveAnime({ ...data, id }));
-            return { success: true };
-        }).catch((err) => {
-            dispatch(errorSaveAnime(err));
-            return { success: false, error: err };
+const fetchAnimeCreate = (data) => async (dispatch) => {
+    dispatch({ type: REQUEST_SAVE_ANIME });
+
+    try {
+        const authorId = await authorActions.getOrCreateAuthor(data.authorName);
+
+        const animeData = {
+            ...data,
+            authorId: authorId,
+        };
+
+        delete animeData.authorName;
+
+        const animeId = await createAnime(animeData);
+
+        dispatch({
+            type: SUCCESS_SAVE_ANIME,
+            payload: { ...animeData, id: animeId },
         });
+
+        return { success: true };
+    } catch (err) {
+        dispatch({
+            type: ERROR_SAVE_ANIME,
+            payload: err,
+        });
+        return { success: false, error: err };
+    }
 };
 
 const exportFunctions = {

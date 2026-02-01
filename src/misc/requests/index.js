@@ -1,12 +1,8 @@
 import axios from 'axios';
-import storage, { keys } from '../storage';
 
-axios.interceptors.request.use((params) => {
-  const token = storage.getItem(keys.TOKEN);
-  if (token) {
-    params.headers.setAuthorization(`Bearer ${token}`);
-  }
-  return params;
+axios.interceptors.request.use((config) => {
+  config.withCredentials = true;
+  return config;
 });
 
 const addAxiosInterceptors = ({
@@ -15,12 +11,17 @@ const addAxiosInterceptors = ({
   axios.interceptors.response.use(
     (response) => response.data,
     (error) => {
-      if (error.response.data
-        .some(beError => beError?.code === 'INVALID_TOKEN')
-      ) {
+      const { status } = error.response || {};
+
+      if (status === 401) {
         onSignOut();
+
+        if (!window.location.pathname.includes('/oauth')) {
+          window.location.href = '/oauth/authenticate';
+        }
       }
-      throw error.response.data;
+
+      return Promise.reject(error.response?.data || error);
     }
   );
 };

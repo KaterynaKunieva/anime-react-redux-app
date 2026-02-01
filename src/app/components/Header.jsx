@@ -2,7 +2,6 @@ import React, { useMemo, useRef, useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
-import Button from 'components/Button';
 import Hover from 'components/Hover';
 import IconButton from 'components/IconButton';
 import IconGlobus from 'components/icons/Globus';
@@ -20,8 +19,6 @@ import useTheme from 'misc/hooks/useTheme';
 import * as pages from 'constants/pages';
 import languages from 'misc/constants/languages';
 import pagesURLs from 'constants/pagesURLs';
-
-import LeftNavBar from './LeftNavBar';
 
 const getClasses = createUseStyles((theme) => ({
   container: {
@@ -79,7 +76,6 @@ const orderedInterfaceLangs = [
 
 const rightPanelItemTypes = {
   LANGUAGE: 'language',
-  LOGIN: 'login',
   SEPARATOR: 'separator',
   USER_NAME: 'userName',
 };
@@ -103,33 +99,30 @@ function Header({
     isUserMenuOpened: false,
   });
 
-  const userName = user.firstName || user.login;
+  const userName = user.user?.name || user.user?.email || '';
 
   const actualOrderedRightPanelItemTypes = useMemo(() => {
     const result = [];
-    if (user.isAuthorized) {
+
+    if (user.user) {
       result.push(rightPanelItemTypes.USER_NAME);
-    } else if (
-      !user.isFetchingUser
-      && currentPage !== pages.login
-    ) {
-      result.push(rightPanelItemTypes.LOGIN);
     }
+
     result.push(rightPanelItemTypes.LANGUAGE);
+
     return result.reduce((acc, item, index) => {
       if (index > 0) {
-        acc.push(rightPanelItemTypes.SEPARATOR);
+        acc.push({ type: rightPanelItemTypes.SEPARATOR, id: `sep-${index}` });
       }
-      acc.push(item);
+      acc.push({ type: item, id: item });
       return acc;
     }, []);
-  }, [user, currentPage]);
+  }, [user.user]);
 
   return (
     <div className={classes.container}>
       <div className={classes.content}>
         <div className={classes.toolBarContainerLeft}>
-          <LeftNavBar />
           <Link
             to={{
               pathname: `${pagesURLs[pages.defaultPage]}`,
@@ -146,9 +139,9 @@ function Header({
           </Link>
         </div>
         <div className={classes.toolBarContainerRight}>
-          {actualOrderedRightPanelItemTypes.map((itemType) => (
-            <>
-              {itemType === rightPanelItemTypes.USER_NAME && (
+          {actualOrderedRightPanelItemTypes.map((item) => (
+            <React.Fragment key={item.id}>
+              {item.type === rightPanelItemTypes.USER_NAME && (
                 <div ref={userMenuRef}>
                   <Hover
                     light
@@ -181,28 +174,7 @@ function Header({
                   </Hover>
                 </div>
               )}
-              {itemType === rightPanelItemTypes.LOGIN && (
-                <Link
-                  to={{
-                    pathname: `${pagesURLs[pages.login]}`,
-                  }}
-                >
-                  <Button
-                    colorVariant="header"
-                    variant="text"
-                  >
-                    <Typography
-                      color="inherit"
-                      variant="subtitle"
-                    >
-                      <strong>
-                        {formatMessage({ id: 'signIn' })}
-                      </strong>
-                    </Typography>
-                  </Button>
-                </Link>
-              )}
-              {itemType === rightPanelItemTypes.LANGUAGE && (
+              {item.type === rightPanelItemTypes.LANGUAGE && (
                 <>
                   <div className={classes.selectedLang}>
                     <Typography
@@ -231,7 +203,7 @@ function Header({
                   </div>
                 </>
               )}
-              {itemType === rightPanelItemTypes.SEPARATOR && (
+              {item.type === rightPanelItemTypes.SEPARATOR && (
                 <Typography
                   color="paper"
                   variant="subtitle"
@@ -241,9 +213,10 @@ function Header({
                   </strong>
                 </Typography>
               )}
-            </>
+            </React.Fragment>
           ))}
         </div>
+
         <Menu
           anchorEl={langsMenuRef.current}
           colorVariant="header"
@@ -255,6 +228,7 @@ function Header({
         >
           {orderedInterfaceLangs.map(lang => (
             <MenuItem
+              key={lang}
               onClick={() => {
                 changePage({
                   locationSearch: {
@@ -276,6 +250,7 @@ function Header({
             </MenuItem>
           ))}
         </Menu>
+
         <Menu
           anchorEl={userMenuRef.current}
           open={state.isUserMenuOpened}
@@ -285,6 +260,7 @@ function Header({
           })}
         >
           <MenuItem
+            key="sign-out"
             onClick={() => {
               setState({
                 ...state,

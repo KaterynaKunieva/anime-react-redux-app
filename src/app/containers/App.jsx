@@ -10,18 +10,15 @@ import {
 } from 'react-redux';
 import { addAxiosInterceptors } from 'misc/requests';
 import * as pages from 'constants/pages';
-import AuthoritiesProvider from 'misc/providers/AuthoritiesProvider';
+import Login from 'pageProviders/Login';
 import DefaultPage from 'pageProviders/Default';
 import Loading from 'components/Loading';
 import Notification from 'components/Notification';
-import LoginPage from 'pageProviders/Login';
 import PageContainer from 'pageProviders/components/PageContainer';
 import pageURLs from 'constants/pagesURLs';
-import SecretPage from 'pageProviders/Secret';
 import AnimeListPage from 'pageProviders/AnimeList';
 import AnimeDetailsPage from 'pageProviders/AnimeDetails';
 import ThemeProvider from 'misc/providers/ThemeProvider';
-import UserProvider from 'misc/providers/UserProvider';
 
 import actionsUser from '../actions/user';
 import Header from '../components/Header';
@@ -38,11 +35,7 @@ function App() {
   });
 
   const {
-    errors,
-    isFailedSignIn,
-    isFailedSignUp,
-    isFetchingSignIn,
-    isFetchingSignUp,
+    user,
     isFetchingUser,
   } = useSelector(({ user }) => user);
 
@@ -50,12 +43,14 @@ function App() {
     addAxiosInterceptors({
       onSignOut: () => dispatch(actionsUser.fetchSignOut()),
     });
+
     dispatch(actionsUser.fetchUser());
-    setState({
-      ...state,
+
+    setState(prevState => ({
+      ...prevState,
       componentDidMount: true,
-    });
-  }, []);
+    }));
+  }, [dispatch]);
 
   const showNotification = (notificationMessage) => {
     setState(prevState => ({
@@ -66,78 +61,35 @@ function App() {
   }
 
   return (
-    <UserProvider>
-      <AuthoritiesProvider>
-        <ThemeProvider>
-          <BrowserRouter>
-            <SearchParamsConfigurator />
-            {/* This is needed to let first render passed for App's
-              * configuration process will be finished (e.g. locationQuery
-              * initializing) */}
-            {state.componentDidMount && (
-              <IntlProvider>
-                <Header onLogout={() => dispatch(actionsUser.fetchSignOut())} />
-                {isFetchingUser && (
-                  <PageContainer>
-                    <Loading />
-                  </PageContainer>
-                )}
-                {!isFetchingUser && (
+    <ThemeProvider>
+      <BrowserRouter>
+        <SearchParamsConfigurator />
+        {state.componentDidMount && (
+          <IntlProvider>
+            <Header onLogout={() => dispatch(actionsUser.fetchSignOut())} />
+
+            {isFetchingUser && (
+              <PageContainer>
+                <Loading />
+              </PageContainer>
+            )}
+
+            {!isFetchingUser && (
+              <>
+                {!user ? (
+                  <Login />
+                ) : (
                   <Routes>
                     <Route
                       element={<DefaultPage />}
                       path={`${pageURLs[pages.defaultPage]}`}
                     />
                     <Route
-                      element={<SecretPage />}
-                      path={`${pageURLs[pages.secretPage]}`}
-                    />
-                    <Route
-                      element={(
-                        <LoginPage
-                          errors={errors}
-                          isFailedSignIn={isFailedSignIn}
-                          isFailedSignUp={isFailedSignUp}
-                          isFetchingSignIn={isFetchingSignIn}
-                          isFetchingSignUp={isFetchingSignUp}
-                          onSignIn={({
-                            email,
-                            login,
-                            password,
-                          }) => dispatch(actionsUser.fetchSignIn({
-                            email,
-                            login,
-                            password,
-                          }))}
-                          onSignUp={({
-                            email,
-                            firstName,
-                            lastName,
-                            login,
-                            password,
-                          }) => dispatch(actionsUser.fetchSignUp({
-                            email,
-                            firstName,
-                            lastName,
-                            login,
-                            password,
-                          }))}
-                        />
-                      )}
-                      path={`${pageURLs[pages.login]}`}
-                    />
-                    <Route
-                      element={
-                        <AnimeListPage
-                          showNotification={showNotification}
-                        />}
+                      element={<AnimeListPage showNotification={showNotification} />}
                       path={pageURLs[pages.animeList]}
                     />
                     <Route
-                      element={
-                        <AnimeDetailsPage
-                          showNotification={showNotification}
-                        />}
+                      element={<AnimeDetailsPage showNotification={showNotification} />}
                       path={pageURLs[pages.animeNew]}
                     />
                     <Route
@@ -150,29 +102,26 @@ function App() {
                       path={pageURLs[pages.animeDetails]}
                     />
                     <Route
-                      element={(
-                        <MissedPage
-                          redirectPage={`${pageURLs[pages.defaultPage]}`}
-                        />
-                      )}
+                      element={<MissedPage redirectPage={`${pageURLs[pages.defaultPage]}`} />}
                       path="*"
                     />
                   </Routes>
                 )}
-                <Notification
-                  message={state.notificationMessage}
-                  isVisible={state.notificationIsVisible}
-                  setIsVisible={(isVisible) => setState(prevState => ({
-                    ...prevState,
-                    notificationIsVisible: isVisible
-                  }))}
-                />
-              </IntlProvider>
+              </>
             )}
-          </BrowserRouter>
-        </ThemeProvider>
-      </AuthoritiesProvider>
-    </UserProvider>
+
+            <Notification
+              message={state.notificationMessage}
+              isVisible={state.notificationIsVisible}
+              setIsVisible={(isVisible) => setState(prevState => ({
+                ...prevState,
+                notificationIsVisible: isVisible
+              }))}
+            />
+          </IntlProvider>
+        )}
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 
