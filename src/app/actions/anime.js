@@ -205,13 +205,53 @@ const fetchAnimeDetails = (id) => (dispatch) => {
         });
 };
 
+const mapAnimeToBody = (data) => {
+    return authorActions.getOrCreateAuthor(data.author)
+        .then(authorId => {
+            const animeData = {
+                ...data,
+                authorId: authorId,
+            };
+
+            delete animeData.author;
+            if (data.year) {
+                animeData.releaseYear = data.year;
+                delete animeData.year;
+            }
+            return animeData;
+        })
+        .catch(err => {
+            if (err.status) {
+                throw err;
+            }
+            return data;
+        })
+};
+
+const mapBodyToAnime = (body, authorName = null) => {
+    const anime = {
+        ...body
+    };
+    if (body.releaseYear) {
+        anime.year = body.releaseYear;
+        delete anime.releaseYear;
+    }
+    if (authorName) {
+        anime.author = authorName;
+        delete anime.authorId;
+    }
+    return anime;
+};
+
 const fetchAnimeUpdate = (id, data) => (dispatch) => {
     dispatch(requestSaveAnime());
-    return updateAnime(id, data)
+    return mapAnimeToBody(data)
+        .then((animeData) => {
+            return mapBodyToAnime(updateAnime(id, animeData), data.author);
+        })
         .catch(() => {
             try {
-                let updated = animeAPI.updateAnime(id, data);
-                return updated;
+                return animeAPI.updateAnime(id, data);
             } catch (err) {
                 return Promise.reject(err);
             }
@@ -225,33 +265,25 @@ const fetchAnimeUpdate = (id, data) => (dispatch) => {
 };
 
 const fetchAnimeCreate = (data) => async (dispatch) => {
-    dispatch({ type: REQUEST_SAVE_ANIME });
-
-    try {
-        const authorId = await authorActions.getOrCreateAuthor(data.author);
-
-        const animeData = {
-            ...data,
-            authorId: authorId,
-        };
-
-        delete animeData.author;
-
-        const animeId = await createAnime(animeData);
-
-        dispatch({
-            type: SUCCESS_SAVE_ANIME,
-            payload: { ...animeData, id: animeId },
+    dispatch(requestSaveAnime());
+    return mapAnimeToBody(data)
+        .then((animeData) => {
+            return mapBodyToAnime(createAnime(animeData), data.author);
+        })
+        .catch(() => {
+            try {
+                return animeAPI.createAnime(data);
+            } catch (err) {
+                return Promise.reject(err);
+            }
+        }).then((id) => {
+            dispatch(successSaveAnime({ ...data, id }));
+            return { success: true };
+        })
+        .catch(err => {
+            dispatch(errorSaveAnime(err));
+            return { success: false, error: err };
         });
-
-        return { success: true };
-    } catch (err) {
-        dispatch({
-            type: ERROR_SAVE_ANIME,
-            payload: err,
-        });
-        return { success: false, error: err };
-    }
 };
 
 const exportFunctions = {
