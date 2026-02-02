@@ -32,14 +32,8 @@ const UpdateAnimeForm = ({ anime, classes, setMode, showNotification }) => {
                     if (result?.success) {
                         showNotification(formatMessage({ id: 'updateNotificationSuccess' }));
                         setMode(ANIME_DETAILS_MODES.VIEW);
-                    } else {
-                        const errorMessage = result?.error?.message || formatMessage({ id: 'updateNotificationError' });
-                        showNotification(errorMessage);
                     }
                 })
-                .catch(err => {
-                    showNotification(formatMessage({ id: 'criticalError' }));
-                });
         }
     };
 

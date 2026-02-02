@@ -228,14 +228,14 @@ const fetchAnimeCreate = (data) => async (dispatch) => {
     dispatch({ type: REQUEST_SAVE_ANIME });
 
     try {
-        const authorId = await authorActions.getOrCreateAuthor(data.authorName);
+        const authorId = await authorActions.getOrCreateAuthor(data.author);
 
         const animeData = {
             ...data,
             authorId: authorId,
         };
 
-        delete animeData.authorName;
+        delete animeData.author;
 
         const animeId = await createAnime(animeData);
 

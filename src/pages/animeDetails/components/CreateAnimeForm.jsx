@@ -32,14 +32,8 @@ const CreateAnimeForm = ({ classes, showNotification }) => {
                     if (result?.success) {
                         showNotification(formatMessage({ id: 'createNotificationSuccess' }));
                         changePage({ pathname: pagesURLs[pages.animeList] });
-                    } else {
-                        const errorMessage = result?.error?.message || formatMessage({ id: 'createNotificationError' });
-                        showNotification(errorMessage);
                     }
                 })
-                .catch(err => {
-                    showNotification(formatMessage({ id: 'criticalError' }));
-                });
         }
     };
 
