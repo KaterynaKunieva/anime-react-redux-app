@@ -19,7 +19,7 @@ const getOrCreateAuthor = async (authorName) => {
       return author.id;
     })
     .catch((err) => {
-      if (err.status === 400) { // exists
+      if (err.status === 409) { // exists
         return getAuthors()
           .then(authors => {
             const existingAuthor = authors.find(

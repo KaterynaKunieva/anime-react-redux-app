@@ -93,7 +93,7 @@ const getAnimeList = (filters = {}, pagination = {}) => {
 
     return axios.post(
         `${ANIME_SERVICE}/_list`, {
-        filters,
+        ...filters,
         ...pagination,
     }, {
         timeout: 10000,
@@ -155,54 +155,18 @@ const updateAnime = (id, data) => {
     );
 };
 
-const fetchAnimeList = ({ filters, pagination } = {}) => (dispatch) => {
-    dispatch(requestAnimeList());
-    return getAnimeList(filters, pagination)
-        .catch(() => {
-            try {
-                return animeAPI.getPaginatedAnime({ filters, pagination });
-            } catch (err) {
-                return Promise.reject(err);
-            }
-        }).then((paginatedAnime) => {
-            dispatch(receiveAnimeList(paginatedAnime));
-        }).catch((err) => {
-            dispatch(errorAnimeList(err));
-        });
-};
-
-const fetchDeleteAnime = (id) => (dispatch) => {
-    dispatch(requestDeleteAnime(id));
-    return deleteAnime(id)
-        .catch(() => {
-            try {
-                animeAPI.deleteAnime(id);
-            } catch (err) {
-                return Promise.reject(err);
-            }
-        })
-        .then(() => {
-            dispatch(successDeleteAnime(id));
-        })
-        .catch((err) => {
-            dispatch(errorDeleteAnime(err));
-        });
-};
-
-const fetchAnimeDetails = (id) => (dispatch) => {
-    dispatch(requestAnimeDetails());
-    return getAnimeDetails(id)
-        .catch(() => {
-            try {
-                return animeAPI.getAnime(id);
-            } catch (err) {
-                return Promise.reject(err);
-            }
-        }).then((data) => {
-            dispatch(receiveAnimeDetails(data));
-        }).catch((err) => {
-            dispatch(errorAnimeDetails(err));
-        });
+const mapBodyToAnime = (body, authorName = null) => {
+    const anime = { ...body };
+    if (body.releaseYear) {
+        anime.year = body.releaseYear;
+        delete anime.releaseYear;
+    }
+    if (body.authorId || body.author) {
+        delete anime.authorId;
+        delete anime.author;
+        anime.author = authorName;
+    }
+    return anime;
 };
 
 const mapAnimeToBody = (data) => {
@@ -228,26 +192,95 @@ const mapAnimeToBody = (data) => {
         })
 };
 
-const mapBodyToAnime = (body, authorName = null) => {
-    const anime = {
-        ...body
-    };
-    if (body.releaseYear) {
-        anime.year = body.releaseYear;
-        delete anime.releaseYear;
+const mapFilterToRequest = async (filter) => {
+    const filterRequest = {};
+    if (filter.author) {
+        try {
+            const authors = await authorActions.getAuthors();
+            const existingAuthor = authors.find(
+                (author) => author.name.toLowerCase() === filter.author.toLowerCase()
+            );
+
+            if (!existingAuthor) {
+                filterRequest.authorId = '00000000-0000-0000-0000-000000000000';
+            } else {
+                filterRequest.authorId = existingAuthor.id;
+            }
+        } catch {
+            return filter;
+        }
     }
-    if (authorName) {
-        anime.author = authorName;
-        delete anime.authorId;
+    if (filter.year) {
+        filterRequest.releaseYear = filter.year;
     }
-    return anime;
+    return filterRequest;
+}
+
+const fetchAnimeList = ({ filters, pagination } = {}) => async (dispatch) => {
+    dispatch(requestAnimeList());
+
+    try {
+        const mappedFilter = await mapFilterToRequest(filters);
+        const response = await getAnimeList(mappedFilter, pagination);
+        const paginatedAnime = response.data || response;
+        const authors = await authorActions.getAuthors();
+        const transformedList = paginatedAnime.list.map(item => {
+            const author = authors.find(a => a.id === item.authorId);
+            return mapBodyToAnime(item, author ? author.name : 'Unknown');
+        });
+        dispatch(receiveAnimeList({ ...paginatedAnime, list: transformedList }));
+
+    } catch (err) {
+        try {
+            const mockData = animeAPI.getPaginatedAnime({ filters, pagination });
+            dispatch(receiveAnimeList(mockData));
+        } catch (mockErr) {
+            dispatch(errorAnimeList(mockErr));
+        }
+    }
+};
+
+const fetchDeleteAnime = (id) => (dispatch) => {
+    dispatch(requestDeleteAnime(id));
+    return deleteAnime(id)
+        .catch(() => {
+            try {
+                animeAPI.deleteAnime(id);
+            } catch (err) {
+                return Promise.reject(err);
+            }
+        })
+        .then(() => {
+            dispatch(successDeleteAnime(id));
+        })
+        .catch((err) => {
+            dispatch(errorDeleteAnime(err));
+        });
+};
+
+const fetchAnimeDetails = (id) => (dispatch) => {
+    dispatch(requestAnimeDetails());
+    return getAnimeDetails(id)
+        .then((data) => {
+            dispatch(receiveAnimeDetails(mapBodyToAnime(data, data.author.name)));
+        })
+        .catch(() => {
+            try {
+                dispatch(receiveAnimeDetails(animeAPI.getAnime(id)));
+            } catch (err) {
+                dispatch(errorAnimeDetails(err));
+            }
+        });
 };
 
 const fetchAnimeUpdate = (id, data) => (dispatch) => {
     dispatch(requestSaveAnime());
     return mapAnimeToBody(data)
         .then((animeData) => {
-            return mapBodyToAnime(updateAnime(id, animeData), data.author);
+            return updateAnime(id, animeData)
+                .then(animeResponse => {
+                    return mapBodyToAnime(animeResponse, data.author);
+                })
         })
         .catch(() => {
             try {
@@ -268,7 +301,10 @@ const fetchAnimeCreate = (data) => async (dispatch) => {
     dispatch(requestSaveAnime());
     return mapAnimeToBody(data)
         .then((animeData) => {
-            return mapBodyToAnime(createAnime(animeData), data.author);
+            return createAnime(animeData)
+                .then(animeResponse => {
+                    return mapBodyToAnime(animeResponse, data.author);
+                });
         })
         .catch(() => {
             try {
@@ -276,8 +312,8 @@ const fetchAnimeCreate = (data) => async (dispatch) => {
             } catch (err) {
                 return Promise.reject(err);
             }
-        }).then((id) => {
-            dispatch(successSaveAnime({ ...data, id }));
+        }).then((anime) => {
+            dispatch(successSaveAnime(anime));
             return { success: true };
         })
         .catch(err => {
